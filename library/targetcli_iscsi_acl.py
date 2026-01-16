@@ -76,7 +76,7 @@ def main():
                 if module.check_mode:
                     module.exit_json(changed=True)
                 else:
-                    rc, out, err = module.run_command("targetcli '/iscsi/%(wwn)s/tpg1/acls create %(initiator_wwn)s'" % module.params)
+                    rc, out, err = module.run_command("targetcli '/iscsi/%(wwn)s/tpg1/acls create %(initiator_wwn)s add_mapped_luns=false'" % module.params)
                     if rc == 0:
                         module.exit_json(changed=True)
                     else:

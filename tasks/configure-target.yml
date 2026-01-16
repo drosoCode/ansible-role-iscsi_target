@@ -6,11 +6,6 @@
   notify:
     - save targetcli configuration
 
-- name: Disable auto add mapped luns
-  targetcli_preferences:
-    preference: 'auto_add_mapped_luns'
-    value: 'false'
-
 # Configure disks
 - include_tasks: configure-disk.yml
   with_items:
