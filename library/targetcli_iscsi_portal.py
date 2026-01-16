@@ -23,6 +23,16 @@ options:
       - port where the target shall be exported on
     required: false
     default: 3260
+  enable_iser:
+    description:
+      - Enable iSER (iSCSI Extensions for RDMA) for the portal
+    required: false
+    default: false
+  enable_offload:
+    description:
+      - Enable offload for the portal
+    required: false
+    default: false
   state:
     description:
       - Should the object be present or absent from TargetCLI configuration
@@ -54,6 +64,8 @@ def main():
                         wwn=dict(required=True),
                         ip=dict(required=True),
                         port=dict(default="3260"),
+                        enable_iser=dict(default=False, type='bool'),
+                        enable_offload=dict(default=False, type='bool'),
                         state=dict(default="present", choices=['present', 'absent']),
                 ),
                 supports_check_mode=True
@@ -86,10 +98,19 @@ def main():
                     module.exit_json(changed=True)
                 else:
                     rc, out, err = module.run_command("targetcli '/iscsi/%(wwn)s/tpg1/portals create %(ip)s %(port)s'" % module.params)
-                    if rc == 0:
-                        module.exit_json(changed=True)
-                    else:
+                    if rc != 0:
                         module.fail_json(msg="Failed to define iSCSI portal object")
+
+                    rc, out, err = module.run_command("targetcli '/iscsi/%(wwn)s/tpg1/portals/%(ip)s:%(port)s enable_iser %(enable_iser)s'" % module.params)
+                    if rc != 0:
+                        module.fail_json(msg="Failed to set iSCSI portal enable_iser option")
+
+                    rc, out, err = module.run_command("targetcli '/iscsi/%(wwn)s/tpg1/portals/%(ip)s:%(port)s enable_offload %(enable_offload)s'" % module.params)
+                    if rc != 0:
+                        module.fail_json(msg="Failed to set iSCSI portal enable_offload option")
+                        
+                    module.exit_json(changed=True)
+
         except OSError as e:
             module.fail_json(msg="Failed to check iSCSI portal object - %s" %(e) )
         module.exit_json(**result)
