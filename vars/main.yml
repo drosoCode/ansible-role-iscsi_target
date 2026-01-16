@@ -2,5 +2,5 @@
 # vars file for ricsanfre.iscsitarget
 
 iscsi_packages:
-  - python3-distutils
+  - python3-distutils-extra
   - targetcli-fb
